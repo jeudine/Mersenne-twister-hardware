@@ -1,4 +1,8 @@
+#ifndef PARAMETERS_H
+#define PARAMETERS_H
+
 struct Parameters {
+
     unsigned int N;
     unsigned int M;
     uint32_t A;
@@ -27,3 +31,5 @@ struct Parameters {
             uint32_t F = 1812433253
             ) : N(N), M(M), A(A), D(D), B(B), C(C), F(F), R(R), U(U), S(S), T(T), L(L) {}
 };
+
+#endif
