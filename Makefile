@@ -26,13 +26,16 @@ $(EXE): $(OBJS)
 
 lint:
 	verilator --lint-only -Wall $(SRCS_SV)
+
 clean:
 	$(RM) $(EXE)
 	$(RM) $(OBJS)
 	$(RM) $(DEPS)
 
-.PHONY: lint clean
+.PHONY: lint clean all
 
 ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),lint)
 -include $(DEPS)
+endif
 endif
