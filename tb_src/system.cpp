@@ -29,11 +29,11 @@ int sc_main(int argc, char *argv[]) {
     sc_trace(trace_f, trig, trig.name());
 
     // simulation
-    seed = 0;
+    seed = 42;
     init = true;
     sc_start(SC_ZERO_TIME);
     init = false;
-    sc_start(200, SC_NS);
+    sc_start(10000, SC_NS);
 
     sc_close_vcd_trace_file(trace_f);
     return 0;

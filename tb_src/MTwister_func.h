@@ -35,4 +35,5 @@ SC_MODULE(MTwister_func) {
     void generate();
     void mthread();
 };
+
 #endif

@@ -46,7 +46,7 @@ void MTwister_func::mthread() {
         if(init) {
             initialize();
         }
-        generate();
+        extract();
         wait();
     }
 }
