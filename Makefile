@@ -15,7 +15,7 @@ CXXFLAGS	= -Wall -Werror -g -O3
 LDFLAGS		= -g
 VFLAGS		= --sc --pins-uint8 --exe $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
 		  $(patsubst %, -LDFLAGS %, $(LDFLAGS)) --Mdir $(OBJ_DIR) --MP\
-		  -o ../$(EXE)
+		  --top-module MTwister -o ../$(EXE) -GN=$(N)
 
 all: $(EXE)
 
@@ -33,3 +33,5 @@ clean:
 	$(RM) -r $(OBJ_DIR)
 
 .PHONY: lint clean all $(EXE)
+
+include parameters.mk
