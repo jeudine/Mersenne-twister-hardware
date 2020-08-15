@@ -23,11 +23,10 @@ localparam INDEX_WIDTH = $clog2(N);
 logic [INDEX_WIDTH-1:0] index;
 enum logic [1:0] {INIT, EXTR, GEN} state;
 
-wire [32-INDEX_WIDTH-1:0] extra_z;
+wire [32-INDEX_WIDTH-1:0] extra_z; //to modify
 assign extra_z = 0;
 
 wire wr;
-assign wr = (rst || (state == INIT) || (state == GEN));
 
 logic [31:0] Di;
 wire [31:0] Do1;
@@ -52,18 +51,13 @@ else if (index == N-1 && state == INIT) // pas sûr
 else
     state <= EXTR;
 
-always_ff @(posedge clk)
-if (rst)
-    index <= 1;
-else if (state == INIT)
-    index <= index + 1;
-
-
 // Initialize and generate the values stored in the memory
 
-logic [31:0] Do1_r;
+logic [31-R:0] Do1_r;
 logic [31:0] x;
 wire [31:0] wire_gen;
+
+assign wr = (rst || (state == INIT) || (state == GEN));
 
 assign wire_gen = Do2 ^ (x >> 1);
 
@@ -73,22 +67,17 @@ if (rst)
 else
 case (state)
     INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index});
-    GEN: begin
-        if (x[0])
-            Di <= wire_gen ^ A;
-        else
-            Di <= wire_gen;
-    end
-    default: Di <= 0;
+    GEN: Di <= x[0] ? wire_gen ^ A : wire_gen;
+    default: ;
 endcase
 
 always_ff @(posedge clk)
 begin
-    Do1_r <= Do1;
-    x <= {Do1_r[31:R], Do1[R-1:0]};
+    Do1_r <= Do1[31:R];
+    x <= {Do1_r, Do1[R-1:0]};
 end
 
-// Extract the number
+// Combinatory logic used to extract the number
 
 wire [31:0] y0;
 wire [31:0] y1;
@@ -99,33 +88,31 @@ assign y1 = y0 ^ ((y0 << S) & B);
 assign y2 = y1 ^ ((y1 << T) & C);
 assign r_num = y2 ^ (y2 >> L);
 
+// index and index_gen handler
 
-/*
-
-//extract
-logic [INDEX_WIDTH-1:0] ext_index;
-logic [W-1:0] y0;
-wire [W-1:0] y1;
-wire [W-1:0] y2;
-wire [W-1:0] y3;
-
-always_ff@(posedge clk)
-if(rst)
-    ext_index <= 0;
+always_ff @(posedge clk)
+if (rst)
+    index <= 1;
 else
-    ext_index <= trig ?
-    (ext_index == N -1) ?
-    0 :
-    ext_index + 1'b1 :
-    ext_index;
+case(state)
+    INIT: index <= (index == N-1) ? 0 : index + 1;
+    GEN: begin
+        index <= (index == N-1) ? 0 : index + 1;
+        index_gen <= (index + 1 + M == N-1) ? 0 : index + 1 + M;
+    end
+    EXTR: if (trig)
+        index <= index + 1;
+    default: ;
+endcase
 
-    assign y0 = mem[ext_index];
-    assign y1 = y0 ^ ((y0 >> U) & D);
-    assign y2 = y1 ^ ((y1 << S) & B);
-    assign y3 = y2 ^ ((y2 << T) & C);
-    assign randNumber = y3 ^ (y3 >> L);
+// ready handler
 
-    //twist
-    */
+always_ff @(posedge clk)
+case (state)
+    EXTR:
+        ready <= trig;
+
+    default: ready <= 0;
+endcase
 
 endmodule
