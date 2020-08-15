@@ -44,19 +44,22 @@ Sram_dp #(N) sram (
     .Do2(Do2)
 );
 
-always_ff@(posedge clk) //faire avec case
-if(rst)
+always_ff @(posedge clk) //faire avec case
+if (rst)
     state <= INIT;
-else if(index == N-1 && state == INIT) // pas sûr
+else if (index == N-1 && state == INIT) // pas sûr
     state <= GEN;
 else
     state <= EXTR;
 
-always_ff@(posedge clk)
-if(rst)
+always_ff @(posedge clk)
+if (rst)
     index <= 1;
-else if(state == INIT)
+else if (state == INIT)
     index <= index + 1;
+
+
+// Initialize and generate the values stored in the memory
 
 logic [31:0] Do1_r;
 logic [31:0] x;
@@ -64,24 +67,37 @@ wire [31:0] wire_gen;
 
 assign wire_gen = Do2 ^ (x >> 1);
 
-always_ff@(posedge clk)
-if(rst)
+always_ff @(posedge clk)
+if (rst)
     Di <= seed;
-else if(state == INIT)
-    Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index});
-else if(state == GEN)
-begin
-    if (x[0])
-        Di <= wire_gen ^ A;
-    else
-        Di <= wire_gen;
-end
+else
+case (state)
+    INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index});
+    GEN: begin
+        if (x[0])
+            Di <= wire_gen ^ A;
+        else
+            Di <= wire_gen;
+    end
+    default: Di <= 0;
+endcase
 
-always_ff@(posedge clk)
+always_ff @(posedge clk)
 begin
     Do1_r <= Do1;
     x <= {Do1_r[31:R], Do1[R-1:0]};
 end
+
+// Extract the number
+
+wire [31:0] y0;
+wire [31:0] y1;
+wire [31:0] y2;
+
+assign y0 = Do1 ^ ((Do1 >> U) & D);
+assign y1 = y0 ^ ((y0 << S) & B);
+assign y2 = y1 ^ ((y1 << T) & C);
+assign r_num = y2 ^ (y2 >> L);
 
 
 /*

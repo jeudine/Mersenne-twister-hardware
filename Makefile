@@ -1,5 +1,3 @@
-CXX		= g++
-
 SRC_DIR		:= src
 TB_SRC_DIR	:= tb_src
 OBJ_DIR		:= obj
@@ -13,7 +11,7 @@ EXE		= simulation.x
 
 CXXFLAGS	= -Wall -Werror -g -O3
 LDFLAGS		= -g
-VFLAGS		= --sc --pins-uint8 --exe $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
+VFLAGS		= --sc --pins-uint8 --exe -Wall $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
 		  $(patsubst %, -LDFLAGS %, $(LDFLAGS)) --Mdir $(OBJ_DIR) --MP\
 		  --top-module MTwister -o ../$(EXE) -GN=$(N)
 
@@ -31,6 +29,7 @@ lint:
 clean:
 	$(RM) $(EXE)
 	$(RM) -r $(OBJ_DIR)
+	$(RM) *.vcd
 
 .PHONY: lint clean all $(EXE)
 
