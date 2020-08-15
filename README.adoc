@@ -1,0 +1,15 @@
+= Mersenne-twister-hardware
+A flexible hardware module written in SystemVerilog which implements the Mersene twister. A test bench written in SystemC, which uses Verilator was created in order to verify and simulate the hardware module.
+
+== Installation
+Clone the repository:
+[source, shell]
+----
+git clone git@github.com:Jeudine/Mersenne-twister-hardware.git
+----
+
+If you will be using the simulation, download https://www.accellera.org/downloads/standards/systemc[SystemC] and https://www.veripool.org/wiki/verilator[Verilator].
+
+Once downloaded, run `make` in the root of the repository.
+
+== Usage
