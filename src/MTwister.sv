@@ -31,7 +31,7 @@ wire wr;
 logic [31:0] Di;
 wire [31:0] Do1;
 wire [31:0] Do2;
-logic [INDEX_WIDTH-1:0] index_gen;
+wire [INDEX_WIDTH-1:0] index_gen;
 
 Sram_dp #(N) sram (
     .clk(clk),
@@ -55,11 +55,11 @@ else
 
 logic [31-R:0] Do1_r;
 logic [31:0] x;
-wire [31:0] wire_gen;
+wire [31:0] comb_gen;
 
 assign wr = (rst || (state == INIT) || (state == GEN));
 
-assign wire_gen = Do2 ^ (x >> 1);
+assign comb_gen = Do2 ^ (x >> 1);
 
 always_ff @(posedge clk)
 if (rst)
@@ -67,7 +67,7 @@ if (rst)
 else
 case (state)
     INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index});
-    GEN: Di <= x[0] ? wire_gen ^ A : wire_gen;
+    GEN: Di <= x[0] ? comb_gen ^ A : comb_gen;
     default: ;
 endcase
 
@@ -95,15 +95,12 @@ if (rst)
     index <= 1;
 else
 case(state)
-    INIT: index <= (index == N-1) ? 0 : index + 1;
-    GEN: begin
-        index <= (index == N-1) ? 0 : index + 1;
-        index_gen <= (index + 1 + M == N-1) ? 0 : index + 1 + M;
-    end
     EXTR: if (trig)
         index <= index + 1;
-    default: ;
+    default: index <= (index == N-1) ? 0 : index + 1;
 endcase
+
+assign index_gen = (index + M == N - 1) ? 0 : index + M;
 
 // ready handler
 

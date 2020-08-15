@@ -9,11 +9,13 @@ SRCS_SV		= $(wildcard $(SRC_DIR)/*.sv)
 SRCS_CPP	= $(wildcard $(TB_SRC_DIR)/*.cpp)
 EXE		= simulation.x
 
+CXX		= gcc
 CXXFLAGS	= -Wall -Werror -g -O3
 LDFLAGS		= -g
-VFLAGS		= --sc --pins-uint8 --exe -Wall $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
-		  $(patsubst %, -LDFLAGS %, $(LDFLAGS)) --Mdir $(OBJ_DIR) --MP\
-		  --top-module MTwister -o ../$(EXE) -GN=$(N)
+VFLAGS		= --sc --pins-uint8 --exe -Wall --compiler $(CXX)\
+		  $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
+		  $(patsubst %, -LDFLAGS %, $(LDFLAGS)) --Mdir $(OBJ_DIR)\
+		  --MP --top-module MTwister -o ../$(EXE) -GN=$(N)
 
 all: $(EXE)
 
