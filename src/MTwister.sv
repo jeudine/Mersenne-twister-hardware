@@ -99,7 +99,7 @@ assign r_num = y2 ^ (y2 >> L);
 
 always_ff @(posedge clk)
 if (rst)
-    index <= 1;
+    index <= 0;
 else
 case(state)
     EXTR: if (trig)
@@ -114,8 +114,7 @@ assign index_gen = (index + M == N - 1) ? 0 : index + M;
 always_ff @(posedge clk)
 case (state)
     EXTR:
-        ready <= trig;
-
+        ready <= 1;
     default: ready <= 0;
 endcase
 
