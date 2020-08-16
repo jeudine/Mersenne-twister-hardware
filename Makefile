@@ -2,9 +2,6 @@ SRC_DIR		:= src
 TB_SRC_DIR	:= tb_src
 OBJ_DIR		:= obj
 
-vpath %.cpp $(TB_SRC_DIR)
-vpath %.h $(TB_SRC_DIR)
-
 SRCS_SV		= $(wildcard $(SRC_DIR)/*.sv)
 SRCS_CPP	= $(wildcard $(TB_SRC_DIR)/*.cpp)
 EXE		= simulation.x
@@ -19,7 +16,7 @@ VFLAGS		= --sc --pins-uint8 --exe -Wall --compiler $(CXX)\
 
 all: $(EXE)
 
-$(OBJ_DIR)/VMTwister.mk: $(SRCS_SV) $(SRCS_CPP)
+$(OBJ_DIR)/VMTwister.mk: $(SRCS_SV) $(SRCS_CPP) #depends from parameters.mk
 	verilator $(VFLAGS) $^
 
 $(EXE): $(OBJ_DIR)/VMTwister.mk
