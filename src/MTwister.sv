@@ -73,7 +73,7 @@ if (rst)
     Di <= seed;
 else
 case (state)
-    INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index});
+    INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index} + 1);
     GEN: Di <= x[0] ? comb_gen ^ A : comb_gen;
     default: ;
 endcase
