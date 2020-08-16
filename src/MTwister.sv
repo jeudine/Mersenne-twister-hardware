@@ -46,10 +46,17 @@ Sram_dp #(N) sram (
 always_ff @(posedge clk) //faire avec case
 if (rst)
     state <= INIT;
-else if (index == N-1 && state == INIT) // pas sûr
-    state <= GEN;
 else
-    state <= EXTR;
+// could be optimized
+case (state)
+    INIT: if (index == N-1)
+        state <= GEN;
+    GEN: if (index == N-1)
+        state <= EXTR;
+    EXTR: if (index == N-1)
+        state <= GEN;
+    default: ;
+endcase
 
 // Initialize and generate the values stored in the memory
 

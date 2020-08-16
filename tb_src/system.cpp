@@ -1,6 +1,7 @@
 #include <systemc>
 #include "MTwister_func.h"
 #include "VMTwister.h"
+#include "verilated_vcd_sc.h"
 
 using namespace sc_core;
 
@@ -30,6 +31,11 @@ int sc_main(int argc, char *argv[]) {
     MT_hdl.r_num(r_num_rtl);
 
     // trace
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc* tfp = new VerilatedVcdSc;
+    MT_hdl.trace(tfp, 99);
+    tfp->open("debug_trace.vcd");
+
     sc_trace_file *trace_f = sc_create_vcd_trace_file("simu_trace");
     trace_f->set_time_unit(1, SC_NS);
 
@@ -53,8 +59,9 @@ int sc_main(int argc, char *argv[]) {
     trig = true;
     sc_start(10, SC_NS);
     trig = false;
-    sc_start(10000, SC_NS);
+    sc_start(50000, SC_NS);
 
     sc_close_vcd_trace_file(trace_f);
+    tfp->close();
     return 0;
 }

@@ -9,9 +9,10 @@ EXE		= simulation.x
 CXX		= gcc
 CXXFLAGS	= -Wall -Werror -g -O3
 LDFLAGS		= -g
-VFLAGS		= --sc --pins-uint8 --exe -Wall --compiler $(CXX)\
+VFLAGS		= --sc --pins-uint8 --exe -Wall -O3 --trace\
+		  --Mdir $(OBJ_DIR) --compiler $(CXX)\
 		  $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
-		  $(patsubst %, -LDFLAGS %, $(LDFLAGS)) --Mdir $(OBJ_DIR)\
+		  $(patsubst %, -LDFLAGS %, $(LDFLAGS))\
 		  --MP --top-module MTwister -o ../$(EXE) -GN=$(N)
 
 all: $(EXE)
