@@ -1,3 +1,11 @@
+//*************************************************************************
+//
+// Copyright 2020 by Julien Eudine. This program is free software; you can
+// redistribute it and/or modify it under the terms of the BSD 3-Clause
+// License
+//
+//*************************************************************************
+
 module MTwister #(parameter
     N = 624, //degree of recurrence
     M = 397, //middle word
@@ -120,7 +128,10 @@ if (rst)
     index <= 0;
 else
 case(state)
-    EXTR: if (trig)
+    EXTR:
+    if (index == N-1)
+        index <= 0;
+    else if (trig)
         index <= index + 1;
     GEN:
     if (state_r0 != GEN)

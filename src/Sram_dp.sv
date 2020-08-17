@@ -1,3 +1,11 @@
+//*************************************************************************
+//
+// Copyright 2020 by Julien Eudine. This program is free software; you can
+// redistribute it and/or modify it under the terms of the BSD 3-Clause
+// License
+//
+//*************************************************************************
+
 module Sram_dp#(parameter N = 624)
 (
     input clk, wr,
