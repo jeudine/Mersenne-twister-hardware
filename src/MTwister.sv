@@ -21,13 +21,9 @@ module MTwister #(parameter
 localparam INDEX_WIDTH = $clog2(N);
 
 logic [INDEX_WIDTH-1:0] index;
-enum logic [1:0] {INIT, EXTR, GEN} state;
-
-wire [32-INDEX_WIDTH-1:0] extra_z; //to modify
-assign extra_z = 0;
+enum logic [1:0] {INIT, EXTR, GEN} state, state_r0, state_r1;
 
 wire wr;
-
 logic [31:0] Di;
 wire [31:0] Do1;
 wire [31:0] Do2;
@@ -43,15 +39,21 @@ Sram_dp #(N) sram (
     .Do2(Do2)
 );
 
-always_ff @(posedge clk) //faire avec case
+always_ff @(posedge clk)
+begin
+    state_r0 <= state;
+    state_r1 <= state_r0;
+end
+
+always_ff @(posedge clk)
 if (rst)
     state <= INIT;
 else
 // could be optimized
 case (state)
-    INIT: if (index == N-1)
+    INIT: if (index == N-2)
         state <= GEN;
-    GEN: if (index == N-1)
+    GEN: if (index == N-2)
         state <= EXTR;
     EXTR: if (index == N-1)
         state <= GEN;
@@ -61,28 +63,43 @@ endcase
 // Initialize and generate the values stored in the memory
 
 logic [31-R:0] Do1_r;
-logic [31:0] x;
+wire [31:0] x;
 wire [31:0] comb_gen;
+logic osci_gen;
 
-assign wr = (rst || (state == INIT) || (state == GEN));
+assign wr = rst || (state == INIT) || (state == GEN && osci_gen);
 
 assign comb_gen = Do2 ^ (x >> 1);
+assign x = {Do1_r, Do1[R-1:0]};
 
 always_ff @(posedge clk)
 if (rst)
     Di <= seed;
 else
 case (state)
-    INIT: Di <= (F * (Di ^ (Di >> (30))) + {extra_z, index} + 1);
-    GEN: Di <= x[0] ? comb_gen ^ A : comb_gen;
+    INIT: begin
+        logic [32-INDEX_WIDTH-1:0] extra_zero;
+        extra_zero = 0;
+        Di <= F * (Di ^ (Di >> (30)))+ {extra_zero, index} + 1;
+    end
+    GEN: Di <= x;//x[0] ? comb_gen ^ A : comb_gen; --Wall
     default: ;
 endcase
 
 always_ff @(posedge clk)
-begin
     Do1_r <= Do1[31:R];
-    x <= {Do1_r, Do1[R-1:0]};
-end
+
+always_ff @(posedge clk)
+    if (state == GEN)
+    begin
+        if (state_r1 == GEN)
+            osci_gen <= ~osci_gen;
+        else
+            osci_gen <= 0;
+    end
+    else
+        osci_gen <= 1;
+
 
 // Combinatory logic used to extract the number
 
@@ -104,7 +121,17 @@ else
 case(state)
     EXTR: if (trig)
         index <= index + 1;
-    default: index <= (index == N-1) ? 0 : index + 1;
+    GEN:
+    if (state_r0 != GEN)
+        index <= 0;
+    else if ( state_r1 != GEN)
+        index <= 1;
+    else if (wr)
+        index <= index + 2;
+    else
+        index <= index - 1;
+
+    default: index <= index + 1;
 endcase
 
 assign index_gen = (index + M == N - 1) ? 0 : index + M;
@@ -114,7 +141,7 @@ assign index_gen = (index + M == N - 1) ? 0 : index + M;
 always_ff @(posedge clk)
 case (state)
     EXTR:
-        ready <= 1;
+    ready <= 1;
     default: ready <= 0;
 endcase
 
