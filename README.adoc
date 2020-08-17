@@ -12,7 +12,7 @@ Clone the repository:
 git clone git@github.com:Jeudine/Mersenne-twister-hardware.git
 ----
 
-If you will be using the simulation, download https://www.accellera.org/downloads/standards/systemc[SystemC] and https://www.veripool.org/wiki/verilator[Verilator].
+If you will be using the simulation and the test bench, download https://www.accellera.org/downloads/standards/systemc[SystemC] and https://www.veripool.org/wiki/verilator[Verilator].
 
 Once downloaded, run `make` in the root of the repository to build the project.
 
@@ -49,6 +49,12 @@ During the *Initialisation* and the *Generation*, the signal `ready` is low. Thi
 
 When `ready` is high, each time `trig` will be high during a rising edge of `clk`, a new random number will be extracted the next rising edge of `clk` on the `r_num` output.
 
-== Simulation and test-bench
+== Simulation and test bench
 
-Run `./simulation.x`.
+Run `./simulation.x` to execute the simulation.
+
+Two `.vcd` trace files will be generated:
+
+* `simu_trace.vcd` contains all the input/output signals of the *MTwister* module and also those of the *MTwister_func* sc_module (a functional module of the Mersenne Twsiter written in c++ used to verify the correctness of *MTwister*).
+
+* `debug_trace.vcd` contains all the internal signals of the *MTwister* module. This trace file makes debug easier.

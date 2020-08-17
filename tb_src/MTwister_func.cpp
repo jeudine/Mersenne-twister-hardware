@@ -1,3 +1,11 @@
+//*************************************************************************
+//
+// Copyright 2020 by Julien Eudine. This program is free software; you can
+// redistribute it and/or modify it under the terms of the BSD 3-Clause
+// License
+//
+//*************************************************************************
+
 #include "MTwister_func.h"
 
 void MTwister_func::initialize() {

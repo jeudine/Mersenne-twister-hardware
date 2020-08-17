@@ -1,3 +1,11 @@
+//*************************************************************************
+//
+// Copyright 2020 by Julien Eudine. This program is free software; you can
+// redistribute it and/or modify it under the terms of the BSD 3-Clause
+// License
+//
+//*************************************************************************
+
 #ifndef MTWISTER_FUNC_H
 #define MTWISTER_FUNC_H
 
@@ -23,7 +31,6 @@ SC_MODULE(MTwister_func) {
     ~MTwister_func() {
         delete[] mem;
     }
-
 
     private:
     Parameters param;
