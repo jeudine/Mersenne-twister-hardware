@@ -53,9 +53,9 @@ else
 case (state)
     INIT: if (index == N-2)
         state <= GEN;
-    GEN: if (index == N-2)
+    GEN: if (index == 0 && !wr && state_r1 == GEN)
         state <= EXTR;
-    EXTR: if (index == N-1)
+    EXTR: if (index == N-2)
         state <= GEN;
     default: ;
 endcase
@@ -69,7 +69,7 @@ wire [31:0] comb_gen;
 logic osci_gen;
 logic [31-R:0] Do1_gen;
 
-assign wr = rst || (state == INIT) || (state == GEN && osci_gen);
+assign wr = rst || (state == INIT) || (state == GEN && osci_gen) || (state == EXTR && index == N-1);
 
 assign comb_gen = Do2 ^ (x_gen >> 1);
 assign x_gen = {Do1_gen, Do1[R-1:0]};
@@ -126,8 +126,12 @@ case(state)
     GEN:
     if (state_r0 != GEN)
         index <= 0;
-    else if ( state_r1 != GEN)
+    else if (state_r1 != GEN)
         index <= 1;
+    else if (index == N-2 && wr)
+        index <= 0;
+    else if (index == 0 && !wr)
+        index <= N-1;
     else if (wr)
         index <= index + 2;
     else
@@ -136,7 +140,7 @@ case(state)
     default: index <= index + 1;
 endcase
 
-assign index_gen = (index + M == N - 1) ? 0 : index + M;
+assign index_gen = (index + M > N) ? index + M - N -1 : index + M - 1;
 
 // ready handler
 
