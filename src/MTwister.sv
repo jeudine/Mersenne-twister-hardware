@@ -74,7 +74,8 @@ assign wr = rst || (state == INIT) || (state == GEN && osci_gen) || (state == EX
 assign comb_gen = Do2 ^ (x_gen >> 1);
 assign x_gen = {Do1_gen, Do1[R-1:0]};
 
-assign Di = (state_r0 == INIT || state == INIT) ? Di_init : x_gen;
+assign Di = (state_r0 == INIT || state == INIT) ? Di_init :
+x_gen[0] ? comb_gen ^ A : comb_gen;
 
 always_ff @(posedge clk)
 if (rst)
@@ -85,7 +86,6 @@ begin
     extra_zero = 0;
     Di_init <= F * (Di_init ^ (Di_init >> (30)))+ {extra_zero, index} + 1;
 end
-//Di <= x;//x[0] ? comb_gen ^ A : comb_gen; --Wall
 
 always_ff @(posedge clk)
 if (wr)
@@ -101,7 +101,6 @@ begin
 end
 else
     osci_gen <= 1;
-
 
 // Combinatory logic used to extract the number
 
