@@ -24,7 +24,7 @@ logic [INDEX_WIDTH-1:0] index;
 enum logic [1:0] {INIT, EXTR, GEN} state, state_r0, state_r1;
 
 wire wr;
-logic [31:0] Di;
+wire [31:0] Di;
 wire [31:0] Do1;
 wire [31:0] Do2;
 wire [INDEX_WIDTH-1:0] index_gen;
@@ -62,43 +62,45 @@ endcase
 
 // Initialize and generate the values stored in the memory
 
-logic [31-R:0] Do1_r;
-wire [31:0] x;
+logic [31:0] Di_init;
+
+wire [31:0] x_gen;
 wire [31:0] comb_gen;
 logic osci_gen;
+logic [31-R:0] Do1_gen;
 
 assign wr = rst || (state == INIT) || (state == GEN && osci_gen);
 
-assign comb_gen = Do2 ^ (x >> 1);
-assign x = {Do1_r, Do1[R-1:0]};
+assign comb_gen = Do2 ^ (x_gen >> 1);
+assign x_gen = {Do1_gen, Do1[R-1:0]};
+
+assign Di = (state_r0 == INIT || state == INIT) ? Di_init : x_gen;
 
 always_ff @(posedge clk)
 if (rst)
-    Di <= seed;
+    Di_init <= seed;
 else
-case (state)
-    INIT: begin
-        logic [32-INDEX_WIDTH-1:0] extra_zero;
-        extra_zero = 0;
-        Di <= F * (Di ^ (Di >> (30)))+ {extra_zero, index} + 1;
-    end
-    GEN: Di <= x;//x[0] ? comb_gen ^ A : comb_gen; --Wall
-    default: ;
-endcase
+begin
+    logic [32-INDEX_WIDTH-1:0] extra_zero;
+    extra_zero = 0;
+    Di_init <= F * (Di_init ^ (Di_init >> (30)))+ {extra_zero, index} + 1;
+end
+//Di <= x;//x[0] ? comb_gen ^ A : comb_gen; --Wall
 
 always_ff @(posedge clk)
-    Do1_r <= Do1[31:R];
+if (wr)
+    Do1_gen <= Do1[31:R];
 
 always_ff @(posedge clk)
-    if (state == GEN)
-    begin
-        if (state_r1 == GEN)
-            osci_gen <= ~osci_gen;
-        else
-            osci_gen <= 0;
-    end
+if (state == GEN)
+begin
+    if (state_r1 == GEN)
+        osci_gen <= ~osci_gen;
     else
-        osci_gen <= 1;
+        osci_gen <= 0;
+end
+else
+    osci_gen <= 1;
 
 
 // Combinatory logic used to extract the number
