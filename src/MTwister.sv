@@ -7,10 +7,10 @@
 //*************************************************************************
 
 module MTwister #(parameter
-    N = 624, //degree of recurrence
-    M = 397, //middle word
-    R = 31, //separation point of one word
-    A = 32'h9908B0DF, //coefficients of the rational normal form twist matrix
+    N = 624, // degree of recurrence
+    M = 397, // middle word
+    R = 31, // separation point of one word
+    A = 32'h9908B0DF, // coefficients of the rational normal form twist matrix
     U = 11, // shift size used in the tempering process
     D = 32'hFFFFFFFF, // XOR mask used in the tempering process
     S = 7, // shift size used in tempering process
