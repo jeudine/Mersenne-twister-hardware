@@ -28,6 +28,7 @@ void Tester::test() {
         trig = 1;
         wait();
     }
+    trig = 0;
 
 
 }

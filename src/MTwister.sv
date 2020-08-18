@@ -110,13 +110,17 @@ end
 else
     osci_gen <= 1;
 
-// Register used for the extraction
+// Register used for the extraction (used to reduce latency)
 
 logic [31:0] y;
+logic trig_r;
 
 always_ff @(posedge clk)
 if (trig)
     y <= Do1;
+
+always_ff @(posedge clk)
+    trig_r <= trig;
 
 // Combinatory logic used to extract the number
 
@@ -124,7 +128,7 @@ wire [31:0] y0;
 wire [31:0] y1;
 wire [31:0] y2;
 
-assign y0 = y ^ ((y >> U) & D);
+assign y0 = (trig && !trig_r) ? y ^ ((y >> U) & D) : Do1 ^ ((Do1 >> U) & D);
 assign y1 = y0 ^ ((y0 << S) & B);
 assign y2 = y1 ^ ((y1 << T) & C);
 assign r_num = y2 ^ (y2 >> L);
