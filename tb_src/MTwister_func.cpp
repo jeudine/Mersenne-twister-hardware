@@ -53,7 +53,9 @@ void MTwister_func::mthread() {
         if(rst) {
             initialize();
         }
+        else if(trig) {
+            extract();
+        }
         wait();
-        extract();
     }
 }

@@ -17,17 +17,17 @@ void Tester::test() {
     sc_core::wait(2);
     rst = false;
     std::cout << "The Initialisation and the first generation start..." << std::endl;
-    while (ready != true) {
+    while (!ready) {
         sc_core::wait();
         counter ++;
     }
     std::cout << "Duration of the Initialisation and Generation: " << counter << " periods" << std::endl;
     std::cout << "The Extraction stage starts..." << std::endl;
 
-    wait();
-    trig = true;
-    wait();
-    trig = false;
+    while (ready) {
+        trig = 1;
+        wait();
+    }
 
 
 }

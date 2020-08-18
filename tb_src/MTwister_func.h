@@ -14,6 +14,7 @@
 
 SC_MODULE(MTwister_func) {
 
+    sc_core::sc_in<bool> clk{"clk"};
     sc_core::sc_in<uint32_t> seed{"seed"};
     sc_core::sc_in<bool> rst{"rst"};
     sc_core::sc_out<uint32_t> r_num{"r_num"};
@@ -23,9 +24,7 @@ SC_MODULE(MTwister_func) {
         mem = new uint32_t[param.N];
         SC_HAS_PROCESS(MTwister_func);
 
-        SC_THREAD(mthread);
-        sensitive << rst.pos() << trig.pos();
-        dont_initialize();
+        SC_CTHREAD(mthread,clk.pos());
     }
 
     ~MTwister_func() {

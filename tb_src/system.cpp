@@ -28,6 +28,7 @@ int sc_main(int argc, char *argv[]) {
     sc_signal<bool> ready("ready");
     sc_clock clk("clk",10,SC_NS);
 
+    MT_func.clk(clk);
     MT_func.rst(rst);
     MT_func.trig(trig);
     MT_func.seed(seed);
