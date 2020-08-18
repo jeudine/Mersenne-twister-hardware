@@ -24,5 +24,10 @@ void Tester::test() {
     std::cout << "Duration of the Initialisation and Generation: " << counter << " periods" << std::endl;
     std::cout << "The Extraction stage starts..." << std::endl;
 
+    wait();
+    trig = true;
+    wait();
+    trig = false;
+
 
 }

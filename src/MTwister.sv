@@ -77,7 +77,7 @@ wire [31:0] comb_gen;
 logic osci_gen;
 logic [31-R:0] Do1_gen;
 
-assign wr = rst || (state == INIT) || (state == GEN && osci_gen) || (state == EXTR && index == N-1);
+assign wr = rst || (state == INIT) || (state == GEN && osci_gen) || (state == EXTR && state_r0 == GEN && index == N-1);
 
 assign comb_gen = Do2 ^ (x_gen >> 1);
 assign x_gen = {Do1_gen, Do1[R-1:0]};
@@ -110,16 +110,25 @@ end
 else
     osci_gen <= 1;
 
+// Register used for the extraction
+
+logic [31:0] y;
+
+always_ff @(posedge clk)
+if (trig)
+    y <= Do1;
+
 // Combinatory logic used to extract the number
 
 wire [31:0] y0;
 wire [31:0] y1;
 wire [31:0] y2;
 
-assign y0 = Do1 ^ ((Do1 >> U) & D);
+assign y0 = y ^ ((y >> U) & D);
 assign y1 = y0 ^ ((y0 << S) & B);
 assign y2 = y1 ^ ((y1 << T) & C);
 assign r_num = y2 ^ (y2 >> L);
+
 
 // index and index_gen handler
 

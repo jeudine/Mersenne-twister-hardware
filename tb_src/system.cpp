@@ -48,12 +48,13 @@ int sc_main(int argc, char *argv[]) {
     tester.r_num_rtl(r_num_rtl);
     tester.ready(ready);
 
-    // trace
+    // Debug trace
     Verilated::traceEverOn(true);
     VerilatedVcdSc* tfp = new VerilatedVcdSc;
-    MT_hdl.trace(tfp, 99);
+    MT_hdl.trace(tfp, 10);
     tfp->open("debug_trace.vcd");
 
+    // Simu trace
     sc_trace_file *trace_f = sc_create_vcd_trace_file("simu_trace");
     trace_f->set_time_unit(1, SC_NS);
 
