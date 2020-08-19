@@ -2,7 +2,7 @@
 
 image:https://img.shields.io/github/license/Jeudine/Mersenne-twister-hardware?style=flat-square[license BSD-3-Clause, link=https://opensource.org/licenses/BSD-3-Clause]
 
-A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A simulation and a test bench written in SystemC, which uses Verilator were created in order to verify the correctness and to measure performance of the hardware module.
+A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A simulation and a test bench written in SystemC, which use Verilator were created in order to verify the correctness and to measure performance of the hardware module.
 
 == Installation
 
