@@ -23,6 +23,7 @@ SC_MODULE(Tester) {
 
     sc_core::sc_in<uint32_t> r_num_rtl{"r_num_rtl"};
     sc_core::sc_in<bool> ready{"ready"};
+    sc_core::sc_in<bool> last{"last"};
 
     SC_CTOR(Tester) {
         SC_CTHREAD(test, clk.pos());

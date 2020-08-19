@@ -23,7 +23,8 @@ module MTwister #(parameter
     input clk, rst, trig,
     input [31:0] seed,
     output [31:0] r_num,
-    output ready
+    output ready,
+    output last
 );
 
 localparam INDEX_WIDTH = $clog2(N);
@@ -32,9 +33,7 @@ logic [INDEX_WIDTH-1:0] index;
 enum logic [1:0] {INIT, EXTR, GEN} state, state_r0, state_r1;
 
 wire wr;
-wire [31:0] Di;
-wire [31:0] Do1;
-wire [31:0] Do2;
+wire [31:0] Di, Do1, Do2;
 wire [INDEX_WIDTH-1:0] index_gen;
 
 Sram_dp #(N) sram (
@@ -57,13 +56,12 @@ always_ff @(posedge clk)
 if (rst)
     state <= INIT;
 else
-// could be optimized
 case (state)
     INIT: if (index == N-2)
         state <= GEN;
     GEN: if (index == 0 && !wr && state_r1 == GEN)
         state <= EXTR;
-    EXTR: if (index == N-2)
+    EXTR: if (last && trig)
         state <= GEN;
     default: ;
 endcase
@@ -77,7 +75,7 @@ wire [31:0] comb_gen;
 logic osci_gen;
 logic [31-R:0] Do1_gen;
 
-assign wr = rst || (state == INIT) || (state == GEN && osci_gen) || (state == EXTR && state_r0 == GEN && index == N-1);
+assign wr = rst || (state == INIT) || (state == GEN && osci_gen && state_r0 != EXTR) || (state == EXTR && state_r0 == GEN && index == N-1);
 
 assign comb_gen = Do2 ^ (x_gen >> 1);
 assign x_gen = {Do1_gen, Do1[R-1:0]};
@@ -101,16 +99,11 @@ if (wr)
 
 always_ff @(posedge clk)
 if (state == GEN)
-begin
-    if (state_r1 == GEN)
-        osci_gen <= ~osci_gen;
-    else
-        osci_gen <= 0;
-end
+    osci_gen <= (state_r1 == GEN) ? ~osci_gen : 0;
 else
     osci_gen <= 1;
 
-// Register used for the extraction (used to reduce latency)
+// Registers used for the extraction (used to avoid latency)
 
 logic [31:0] y;
 logic trig_r;
@@ -127,12 +120,22 @@ always_ff @(posedge clk)
 wire [31:0] y0;
 wire [31:0] y1;
 wire [31:0] y2;
+wire [31:0] y3;
 
 assign y0 = (trig && !trig_r) ? y ^ ((y >> U) & D) : Do1 ^ ((Do1 >> U) & D);
 assign y1 = y0 ^ ((y0 << S) & B);
 assign y2 = y1 ^ ((y1 << T) & C);
-assign r_num = y2 ^ (y2 >> L);
+assign y3 = y2 ^ (y2 >> L);
 
+// Register used to hold the random number on the output during the extraction
+
+logic [31:0] y3_r;
+
+always_ff @(posedge clk)
+if(trig_r)
+    y3_r <= y3;
+
+assign r_num = trig_r ? y3 : y3_r;
 
 // index and index_gen handler
 
@@ -142,7 +145,7 @@ if (rst)
 else
 case(state)
     EXTR:
-    if (index == N-1)
+    if (index == N-1 && state_r0 == GEN)
         index <= 0;
     else if (trig)
         index <= index + 1;
@@ -167,11 +170,10 @@ assign index_gen = (index + M > N) ? index + M - N -1 : index + M - 1;
 
 // ready handler
 
-always_ff @(posedge clk)
-case (state)
-    EXTR:
-    ready <= 1;
-    default: ready <= 0;
-endcase
+assign ready = (state_r0 == EXTR) && (state == EXTR);
+
+// last handler
+
+assign last = (state_r0 == EXTR) && (index == N-1);
 
 endmodule

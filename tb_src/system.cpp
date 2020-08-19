@@ -26,6 +26,7 @@ int sc_main(int argc, char *argv[]) {
     sc_signal<uint32_t> r_num_rtl("r_num_rtl");
     sc_signal<bool> trig("trig");
     sc_signal<bool> ready("ready");
+    sc_signal<bool> last("last");
     sc_clock clk("clk",10,SC_NS);
 
     MT_func.clk(clk);
@@ -40,6 +41,7 @@ int sc_main(int argc, char *argv[]) {
     MT_hdl.ready(ready);
     MT_hdl.seed(seed);
     MT_hdl.r_num(r_num_rtl);
+    MT_hdl.last(last);
 
     tester.clk(clk);
     tester.rst(rst);
@@ -48,6 +50,7 @@ int sc_main(int argc, char *argv[]) {
     tester.r_num_func(r_num_func);
     tester.r_num_rtl(r_num_rtl);
     tester.ready(ready);
+    tester.last(last);
 
     // Debug trace
     Verilated::traceEverOn(true);
@@ -68,9 +71,10 @@ int sc_main(int argc, char *argv[]) {
 
     sc_trace(trace_f, r_num_rtl, r_num_rtl.name());
     sc_trace(trace_f, ready, ready.name());
+    sc_trace(trace_f, last, last.name());
 
     // simulation
-    sc_start(50000, SC_NS);
+    sc_start();
 
     sc_close_vcd_trace_file(trace_f);
     tfp->close();
