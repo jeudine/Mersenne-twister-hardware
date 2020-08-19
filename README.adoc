@@ -1,8 +1,8 @@
-= Mersenne-twister-hardware 
+= Mersenne-twister-hardware
 
 image:https://img.shields.io/github/license/Jeudine/Mersenne-twister-hardware?style=flat-square[license BSD-3-Clause, link=https://opensource.org/licenses/BSD-3-Clause]
 
-A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A test bench written in SystemC, which uses Verilator was created in order to verify and simulate the hardware module.
+A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A simulation and a test bench written in SystemC, which uses Verilator was created in order to verify the correctness and to measure performance of the hardware module.
 
 == Installation
 
@@ -39,22 +39,41 @@ module MTwister #(parameter
     input clk, rst, trig,
     input [31:0] seed,
     output [31:0] r_num,
-    output ready
+    output ready,
+    output last
 );
 ----
 
 The reset (`rst`) is synchronous and positive-logic. Once `rst` becomes low, the module is initialized with the value of the `seed` signal.
 
-During the *Initialisation* and the *Generation*, the signal `ready` is low. This signal is high when numbers are ready to be extracted.
+During the *Initialization* and the *Generation*, the signal `ready` is low. This signal is high when numbers are ready to be extracted.
 
 When `ready` is high, each time `trig` will be high during a rising edge of `clk`, a new random number will be extracted the next rising edge of `clk` on the `r_num` output.
 
+The signal `last` is high if and only if there's only one number left to extract. It indicates the last extraction before the next *Generation*.
+
+The default parameters correspond to the standard *MT19937*.
+
 == Simulation and test bench
 
-Run `./simulation.x` to execute the simulation.
+Run `./simulation.x` to execute the simulation. During the execution some information are directly printed on the standard output.
 
-Two `.vcd` trace files will be generated:
+A functional module of the Mersenne Twister written in C++ (*MTwister_func*) is used to verify the correctness of the SystemVerilog module.
 
-* `simu_trace.vcd` contains all the input/output signals of the *MTwister* module and also those of the *MTwister_func* sc_module (a functional module of the Mersenne Twsiter written in c++ used to verify the correctness of *MTwister*).
+During the simulation two `.vcd` trace files will be generated:
+
+* `simu_trace.vcd` contains all the input/output signals of the *MTwister* module and also those of the *MTwister_func* sc_module.
 
 * `debug_trace.vcd` contains all the internal signals of the *MTwister* module. This trace file makes debug easier.
+
+== Performance
+
+=== Duration
+
+* *Initialization*: _N_ periods
+* *Generation*: _2(N + 1)_ periods
+* Minimum *Extraction* duration for _N_ values: _N_ periods
+
+=== Extraction
+
+This module allows *Burst Transfer*, i.e., you can hold the signal *trig* high in order to have a new random number at each `clk` cycle.

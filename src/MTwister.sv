@@ -137,7 +137,7 @@ if(trig_r)
 
 assign r_num = trig_r ? y3 : y3_r;
 
-// index and index_gen handler
+// Handling of index
 
 always_ff @(posedge clk)
 if (rst)
@@ -168,11 +168,7 @@ endcase
 
 assign index_gen = (index + M > N) ? index + M - N -1 : index + M - 1;
 
-// ready handler
-
 assign ready = (state_r0 == EXTR) && (state == EXTR);
-
-// last handler
 
 assign last = (state_r0 == EXTR) && (index == N-1);
 
