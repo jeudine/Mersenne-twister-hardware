@@ -54,6 +54,8 @@ The signal `last` is high if and only if there's only one number left to extract
 
 The default parameters correspond to the standard *MT19937*.
 
+All the Systemverilog code used to implement the *MTwister* module can be found in `src/`.
+
 == Simulation and test bench
 
 Run `./simulation.x <value of the seed>` to execute the simulation. During the execution some information are directly printed on the standard output.
