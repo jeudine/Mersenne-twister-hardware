@@ -2,7 +2,7 @@
 
 image:https://img.shields.io/github/license/Jeudine/Mersenne-twister-hardware?style=flat-square[license BSD-3-Clause, link=https://opensource.org/licenses/BSD-3-Clause]
 
-A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A simulation and a test bench written in SystemC, which uses Verilator was created in order to verify the correctness and to measure performance of the hardware module.
+A flexible hardware module written in SystemVerilog which implements the Mersene twister (using a 32-bit word length). A simulation and a test bench written in SystemC, which uses Verilator were created in order to verify the correctness and to measure performance of the hardware module.
 
 == Installation
 
@@ -48,7 +48,7 @@ The reset (`rst`) is synchronous and positive-logic. Once `rst` becomes low, the
 
 During the *Initialization* and the *Generation*, the signal `ready` is low. This signal is high when numbers are ready to be extracted.
 
-When `ready` is high, each time `trig` will be high during a rising edge of `clk`, a new random number will be extracted the next rising edge of `clk` on the `r_num` output.
+When `ready` is high, each time `trig` will be high during a rising edge of `clk`, a new random number will be extracted the next rising edge of `clk` on the `r_num` output (the value holds until the next number extraction).
 
 The signal `last` is high if and only if there's only one number left to extract. It indicates the last extraction before the next *Generation*.
 
@@ -56,9 +56,9 @@ The default parameters correspond to the standard *MT19937*.
 
 == Simulation and test bench
 
-Run `./simulation.x` to execute the simulation. During the execution some information are directly printed on the standard output.
+Run `./simulation.x <value of the seed>` to execute the simulation. During the execution some information are directly printed on the standard output.
 
-A functional module of the Mersenne Twister written in C++ (*MTwister_func*) is used to verify the correctness of the SystemVerilog module.
+A functional module of the Mersenne Twister written in C++ (*MTwister_func*) is used to verify the correctness of the SystemVerilog module. The default parameters used for this module are the same as those used for *MTwister*, but feel free to play with `tb_src/Parameters.h` in order to test other parameters.
 
 During the simulation two `.vcd` trace files will be generated:
 

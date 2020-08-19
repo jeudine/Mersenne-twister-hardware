@@ -25,13 +25,13 @@ SC_MODULE(Tester) {
     sc_core::sc_in<bool> ready{"ready"};
     sc_core::sc_in<bool> last{"last"};
 
-    SC_CTOR(Tester) {
+    Tester(sc_core::sc_module_name n, uint32_t s) : sc_module(), seed_v(s) {
+        SC_HAS_PROCESS(Tester);
         SC_CTHREAD(test, clk.pos());
     }
 
     private:
-    unsigned int counter {0};
-
+    uint32_t seed_v;
     void test();
 
 };

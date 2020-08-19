@@ -15,10 +15,18 @@
 using namespace sc_core;
 
 int sc_main(int argc, char *argv[]) {
+    if (argc != 2) {
+        cerr << "Wrong number of arguments, please indicate the value of the seed!" << endl;
+        cerr << "./simulation.x <value of the seed>" << endl;
+        return 1;
+    }
+
+    uint32_t seed_v = std::stoi(argv[1]);
+
     Parameters param;
     MTwister_func MT_func("MT_func", param);
     VMTwister MT_hdl("MT_hdl");
-    Tester tester("tester");
+    Tester tester("tester", seed_v);
 
     sc_signal<uint32_t> seed("seed");
     sc_signal<bool> rst("rst");

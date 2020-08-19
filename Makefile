@@ -13,11 +13,11 @@ VFLAGS		= --sc --pins-uint8 --exe -Wall -O3 --trace\
 		  --Mdir $(OBJ_DIR) --compiler $(CXX)\
 		  $(patsubst %, -CFLAGS %, $(CXXFLAGS))\
 		  $(patsubst %, -LDFLAGS %, $(LDFLAGS))\
-		  --MP --top-module MTwister -o ../$(EXE) -GN=$(N)
+		  --MP --top-module MTwister -o ../$(EXE)
 
 all: $(EXE)
 
-$(OBJ_DIR)/VMTwister.mk: $(SRCS_SV) $(SRCS_CPP) #depends from parameters.mk
+$(OBJ_DIR)/VMTwister.mk: $(SRCS_SV) $(SRCS_CPP)
 	verilator $(VFLAGS) $^
 
 $(EXE): $(OBJ_DIR)/VMTwister.mk
@@ -32,5 +32,3 @@ clean:
 	$(RM) *.vcd
 
 .PHONY: lint clean all $(EXE)
-
-include parameters.mk

@@ -11,13 +11,18 @@
 #include <cstdlib>
 
 void Tester::test() {
+    unsigned int counter = 0;
+    unsigned int nb_errors = 0;
+
     std::cout << std::endl << "############# Mersenne-twister-hardware #############" << std::endl;
     wait();
     rst = true;
-    seed = 42; // to modify
+    seed = seed_v;
     wait(2);
     rst = false;
     std::cout << "The initialisation and the first generation start..." << std::endl;
+    std::cout << "Seed: " << seed_v << std::endl;
+
     while (!ready) {
         wait();
         counter ++;
@@ -29,14 +34,18 @@ void Tester::test() {
     while (ready && !last) {
         trig = std::rand() % 2;
         wait();
+        if (r_num_func != r_num_rtl && trig)
+            nb_errors ++;
     }
 
     while (!trig) {
         trig = std::rand() % 2;
         wait();
+        if (r_num_func != r_num_rtl && trig)
+            nb_errors ++;
     }
     std::cout << "All numbers have been output, the first extraction stage is over." << std::endl;
-    trig = 0;
+    trig = false;
     wait();
 
     counter = 0;
@@ -51,14 +60,20 @@ void Tester::test() {
     while (ready && !last) {
         trig = std::rand() % 2;
         wait();
+        if (r_num_func != r_num_rtl && trig)
+            nb_errors ++;
     }
 
     while (!trig) {
         trig = std::rand() % 2;
         wait();
+        if (r_num_func != r_num_rtl && trig)
+            nb_errors ++;
     }
     std::cout << "All numbers have been output, the second extraction stage is over." << std::endl;
-    trig = 0;
+    trig = false;
     wait(10);
+
+    std::cout << "The simulation is over, number of errors during the extractions: " << nb_errors << std::endl;
     sc_core::sc_stop();
 }
