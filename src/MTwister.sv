@@ -83,14 +83,15 @@ assign x_gen = {Do1_gen, Do1[R-1:0]};
 assign Di = (state_r0 == INIT || state == INIT) ? Di_init :
 x_gen[0] ? comb_gen ^ A : comb_gen;
 
+wire [32-INDEX_WIDTH-1:0] extra_zero;
+assign extra_zero = 0;
+
 always_ff @(posedge clk)
 if (rst)
     Di_init <= seed;
 else
 begin
-    logic [32-INDEX_WIDTH-1:0] extra_zero;
-    extra_zero = 0;
-    Di_init <= F * (Di_init ^ (Di_init >> (30)))+ {extra_zero, index} + 1;
+    Di_init <= F * (Di_init ^ (Di_init >> (30))) + {extra_zero, index} + 1;
 end
 
 always_ff @(posedge clk)
