@@ -73,7 +73,7 @@ During the simulation two `.vcd` trace files will be generated:
 === Duration
 
 * *Initialization*: _N_ periods
-* *Generation*: _2(N + 1)_ periods
+* *Generation*: _2N + 1_ periods
 * Minimum *Extraction* duration for _N_ values: _N_ periods
 
 === Extraction

@@ -30,7 +30,6 @@ module MTwister #(parameter
 localparam INDEX_WIDTH = $clog2(N);
 
 logic [INDEX_WIDTH-1:0] index;
-enum logic [2:0] {INIT0, INIT1, GEN0, GEN1, GEN2, EXTR0, EXTR1} state;
 
 wire wr;
 wire [31:0] Di, Do1, Do2;
@@ -45,6 +44,10 @@ Sram_dp #(N) sram (
     .Do1(Do1),
     .Do2(Do2)
 );
+
+// FSM
+
+enum logic [2:0] {INIT0, INIT1, GEN0, GEN1, GEN2, EXTR0, EXTR1} state;
 
 always_ff @(posedge clk)
 if (rst)
