@@ -1,0 +1,12 @@
+# read design
+read_verilog -sv src/MTwister.sv src/Sram_dp.sv
+
+# elaborate design hierarchy
+hierarchy -check -top MTwister
+
+# high-level synthesis
+proc ; opt; fsm MTwister; opt; memory MTwister; opt;
+
+stat
+
+show MTwister

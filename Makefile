@@ -26,9 +26,12 @@ $(EXE): $(OBJ_DIR)/VMTwister.mk
 lint:
 	verilator --lint-only -Wall $(SRCS_SV)
 
+syn:
+	yosys synthesis.ys
+
 clean:
 	$(RM) $(EXE)
 	$(RM) -r $(OBJ_DIR)
 	$(RM) *.vcd
 
-.PHONY: lint clean all $(EXE)
+.PHONY: lint clean all $(EXE) syn
