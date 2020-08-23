@@ -30,7 +30,7 @@ module MTwister #(parameter
 localparam INDEX_WIDTH = $clog2(N);
 
 logic [INDEX_WIDTH-1:0] index;
-enum logic [1:0] {INIT, EXTR, GEN} state, state_r0, state_r1;
+enum logic [2:0] {INIT0, INIT1, GEN0, GEN1, GEN2, EXTR0, EXTR1} state;
 
 wire wr;
 wire [31:0] Di, Do1, Do2;
@@ -47,22 +47,26 @@ Sram_dp #(N) sram (
 );
 
 always_ff @(posedge clk)
-begin
-    state_r0 <= state;
-    state_r1 <= state_r0;
-end
-
-always_ff @(posedge clk)
 if (rst)
-    state <= INIT;
+    state <= INIT0;
 else
 case (state)
-    INIT: if (index == N-2)
-        state <= GEN;
-    GEN: if (index == 0 && !wr && state_r1 == GEN)
-        state <= EXTR;
-    EXTR: if (last && trig)
-        state <= GEN;
+    INIT0: if (index == N-2)
+        state <= INIT1;
+    INIT1: state <= GEN0;
+
+    GEN0: state <= GEN1;
+
+    GEN1: state <= GEN2;
+
+    GEN2: if (index == 0 && !wr)
+        state <= EXTR0;
+
+    EXTR0: state <= EXTR1;
+
+    EXTR1: if (last && trig)
+        state <= GEN0;
+
     default: ;
 endcase
 
@@ -75,34 +79,31 @@ wire [31:0] comb_gen;
 logic osci_gen;
 logic [31-R:0] Do1_gen;
 
-assign wr = rst || (state == INIT) || (state == GEN && osci_gen && state_r0 != EXTR) || (state == EXTR && state_r0 == GEN && index == N-1);
+assign wr = rst || state == INIT0 || state == INIT1 || (state == GEN2 && osci_gen) || state == EXTR0;
 
 assign comb_gen = Do2 ^ (x_gen >> 1);
 assign x_gen = {Do1_gen, Do1[R-1:0]};
 
-assign Di = (state_r0 == INIT || state == INIT) ? Di_init :
+assign Di = (state == INIT0 || state == INIT1) ? Di_init :
 x_gen[0] ? comb_gen ^ A : comb_gen;
 
-wire [32-INDEX_WIDTH-1:0] extra_zero;
-assign extra_zero = 0;
+localparam W_INDEX_WIDTH = 32 - INDEX_WIDTH;
 
 always_ff @(posedge clk)
 if (rst)
     Di_init <= seed;
 else
-begin
-    Di_init <= F * (Di_init ^ (Di_init >> (30))) + {extra_zero, index} + 1;
-end
+    Di_init <= F * (Di_init ^ (Di_init >> (30))) + {{W_INDEX_WIDTH{1'b0}}, index} + 1;
 
 always_ff @(posedge clk)
 if (wr)
     Do1_gen <= Do1[31:R];
 
 always_ff @(posedge clk)
-if (state == GEN)
-    osci_gen <= (state_r1 == GEN) ? ~osci_gen : 0;
-else
+if (state == GEN1)
     osci_gen <= 1;
+else
+    osci_gen <= ~osci_gen;
 
 // Registers used for the extraction (used to avoid latency)
 
@@ -145,17 +146,16 @@ if (rst)
     index <= 0;
 else
 case(state)
-    EXTR:
-    if (index == N-1 && state_r0 == GEN)
-        index <= 0;
-    else if (trig)
-        index <= index + 1;
-    GEN:
-    if (state_r0 != GEN)
-        index <= 0;
-    else if (state_r1 != GEN)
-        index <= 1;
-    else if (index == N-2 && wr)
+    INIT0: index <= index + 1;
+
+    INIT1: index <= 0;
+
+    GEN0: index <= 1;
+
+    GEN1: index <= 0;
+
+    GEN2:
+    if (index == N-2 && wr)
         index <= 0;
     else if (index == 0 && !wr)
         index <= N-1;
@@ -164,13 +164,23 @@ case(state)
     else
         index <= index - 1;
 
-    default: index <= index + 1;
+    EXTR0: index <= 0;
+
+    EXTR1:
+    if (trig)
+    begin
+        if (index == N-1)
+            index <= 0;
+        else
+            index <= index + 1;
+    end
+    default: ;
 endcase
 
 assign index_gen = (index + M > N) ? index + M - N -1 : index + M - 1;
 
-assign ready = (state_r0 == EXTR) && (state == EXTR);
+assign ready = state == EXTR1;
 
-assign last = (state_r0 == EXTR) && (index == N-1);
+assign last = (state == EXTR1 && index == N-1);
 
 endmodule
