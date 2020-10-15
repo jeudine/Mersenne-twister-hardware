@@ -21,4 +21,11 @@ jobs:
         - stage: sw_build
           name: build software
           script: make
+        - stage: test
+          name: run the testbench
+          script:
+              - ./simulation.x 0
+              - ./simulation.x
+              - ./simulation.x 19982312
+
 
