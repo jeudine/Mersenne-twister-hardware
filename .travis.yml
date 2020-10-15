@@ -24,7 +24,7 @@ jobs:
           name: run the testbench
           script:
               - ./simulation.x 0
-              - ./simulation.x
+              - ./simulation.x 42
               - ./simulation.x 19982312
 
 
