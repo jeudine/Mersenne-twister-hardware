@@ -1,0 +1,22 @@
+language: cpp
+sudo: false
+cache: apt
+
+addons:
+    apt:
+        packages:
+        - libsystemc
+        - verilator
+
+
+branches:
+    only:
+        - master
+        - dev_travis
+
+jobs:
+    include:
+        - stage: sw_build
+          name: build software
+          script: make
+
