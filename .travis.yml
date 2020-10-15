@@ -16,11 +16,10 @@ branches:
         - master
         - dev_travis
 
+install: make
+
 jobs:
     include:
-        - stage: sw_build
-          name: build software
-          script: make
         - stage: test
           name: run the testbench
           script:
