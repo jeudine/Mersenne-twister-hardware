@@ -2,10 +2,12 @@ language: cpp
 sudo: false
 cache: apt
 
+dist: focal
 addons:
     apt:
         packages:
         - verilator
+        - libsystemc
 
 
 branches:
