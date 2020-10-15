@@ -7,7 +7,8 @@ addons:
     apt:
         packages:
         - verilator
-        - libsystemc
+        - libsystemc-dev
+
 
 
 branches:
