@@ -9,8 +9,6 @@ addons:
         - verilator
         - libsystemc-dev
 
-
-
 branches:
     only:
         - master
