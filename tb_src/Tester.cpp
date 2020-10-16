@@ -63,5 +63,6 @@ void Tester::test() {
     wait(10);
 
     std::cout << "The simulation is over, number of errors during the extractions: " << nb_errors << std::endl;
+    test_failed = (nb_errors) ? 1 : 0;
     sc_core::sc_stop();
 }

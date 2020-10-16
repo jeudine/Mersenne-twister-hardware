@@ -30,9 +30,12 @@ SC_MODULE(Tester) {
         SC_CTHREAD(test, clk.pos());
     }
 
+    int getExitStatus() const { return test_failed;}
+
     private:
     uint32_t seed_v;
     void test();
+    int test_failed;
 
 };
 
