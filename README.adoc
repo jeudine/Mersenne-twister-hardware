@@ -20,7 +20,7 @@ Once downloaded, run `make` in the root of the repository to build the project.
 
 The top module is defined with the following parameters and ports:
 
-[source, verilog]
+[source, systemverilog]
 ----
 module MTwister #(parameter
     N = 624, // degree of recurrence
